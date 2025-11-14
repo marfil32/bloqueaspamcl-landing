@@ -3,11 +3,12 @@ const CF_CREATE_SUBSCRIPTION = 'https://us-central1-bloqueaspamcl-29064.cloudfun
 const CF_CHECK_USER = 'https://us-central1-bloqueaspamcl-29064.cloudfunctions.net/checkUser';
 
 let selectedPlatform = null;
-let currentStep = 'platform'; // platform → signup → plans → download
+let currentStep = 'platform';
 let userEmail = '';
+let selectedPlan = 'free';
 
-// Countdown
 const PROMO_END = new Date('2024-11-30T23:59:59');
+
 function updateCountdown() {
     const now = new Date();
     const diff = Math.max(0, PROMO_END - now);
@@ -20,18 +21,17 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// Seleccionar plataforma
 window.selectPlatform = function(platform) {
     selectedPlatform = platform;
     
     if (platform === 'ios') {
         showIOSWaitlist();
     } else {
-        // Android: continuar con signup
         currentStep = 'signup';
         document.getElementById('platformSection').classList.add('hidden');
         document.getElementById('stepsSection').classList.remove('hidden');
         showSignupForm();
+        setTimeout(() => lucide.createIcons(), 100);
     }
 };
 
@@ -39,17 +39,23 @@ function showIOSWaitlist() {
     const container = document.getElementById('formContainer');
     container.innerHTML = `
         <div class="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 class="text-lg font-semibold mb-2">📱 iOS Próximamente</h3>
-            <p class="text-sm text-slate-600 mb-4">
-                Estamos trabajando en la versión para iPhone. 
-                Déjanos tu correo y te avisaremos cuando esté lista.
-            </p>
-            <form onsubmit="submitIOSWaitlist(event)" class="space-y-3">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="p-3 rounded-xl bg-slate-100">
+                    <i data-lucide="smartphone" class="w-8 h-8 text-slate-700"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">iOS Próximamente</h3>
+                    <p class="text-sm text-slate-600">Te avisaremos cuando esté lista</p>
+                </div>
+            </div>
+            
+            <form onsubmit="submitIOSWaitlist(event)" class="space-y-3 mt-4">
                 <input type="email" id="iosEmail" required 
                        placeholder="tu@email.com"
                        class="w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
                 <button type="submit" 
-                        class="w-full rounded-xl bg-slate-900 text-white px-4 py-2 font-medium">
+                        class="w-full rounded-xl bg-slate-900 text-white px-4 py-2 font-medium flex items-center justify-center gap-2">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
                     Unirme a la lista
                 </button>
             </form>
@@ -57,6 +63,7 @@ function showIOSWaitlist() {
     `;
     document.getElementById('platformSection').classList.add('hidden');
     document.getElementById('stepsSection').classList.add('hidden');
+    setTimeout(() => lucide.createIcons(), 100);
 }
 
 window.submitIOSWaitlist = async function(e) {
@@ -130,7 +137,6 @@ function showSignupForm() {
 }
 
 window.signInWithGoogle = async function() {
-    // TODO: Implementar OAuth real
     showMessage('🔄 Redirigiendo a Google...', 'info');
     setTimeout(() => {
         userEmail = 'usuario@gmail.com';
@@ -174,12 +180,38 @@ function goToPlans() {
     currentStep = 'plans';
     updateSteps();
     showPlansForm();
+    setTimeout(() => lucide.createIcons(), 100);
 }
 
 function showPlansForm() {
     const container = document.getElementById('formContainer');
     container.innerHTML = `
         <div class="space-y-4">
+            <!-- Plan Gratis -->
+            <div onclick="selectPlan('free')" 
+                 id="planFree"
+                 class="relative rounded-3xl border-2 border-slate-900 shadow-lg p-5 cursor-pointer bg-white transition">
+                <h3 class="text-base font-semibold">Plan Gratis</h3>
+                <div class="mt-2 flex items-end gap-2">
+                    <span class="text-2xl font-bold">$0</span>
+                    <span class="text-slate-500">/mes</span>
+                </div>
+                <ul class="mt-3 space-y-1 text-sm text-slate-700">
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Bloqueo spam comunitario</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-slate-400">
+                        <i data-lucide="x" class="w-4 h-4 mt-0.5"></i>
+                        <span>Sin bloqueo 600/809</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-slate-400">
+                        <i data-lucide="x" class="w-4 h-4 mt-0.5"></i>
+                        <span>Sin lista segura</span>
+                    </li>
+                </ul>
+            </div>
+            
             <!-- Plan Mensual -->
             <div onclick="selectPlan('premium_monthly')" 
                  id="planMonthly"
@@ -194,9 +226,18 @@ function showPlansForm() {
                 </div>
                 <div class="text-xs text-slate-400 line-through">$2,990 /mes</div>
                 <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li>• Todas las funciones</li>
-                    <li>• 7 días gratis</li>
-                    <li>• Cancela cuando quieras</li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Todas las funciones</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>7 días gratis</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Cancela cuando quieras</span>
+                    </li>
                 </ul>
             </div>
             
@@ -205,7 +246,7 @@ function showPlansForm() {
                  id="planAnnual"
                  class="relative rounded-3xl border-2 border-slate-300 p-5 cursor-pointer hover:border-slate-400 bg-white transition">
                 <div class="absolute -top-3 right-5 px-3 py-1 rounded-full text-[11px] bg-emerald-100 border border-emerald-300 text-emerald-900">
-                    Ahorra $3,000
+                    Ahorra $4,000
                 </div>
                 <h3 class="text-base font-semibold">Premium Anual</h3>
                 <div class="mt-2 flex items-end gap-2">
@@ -214,46 +255,72 @@ function showPlansForm() {
                 </div>
                 <div class="text-xs text-slate-400 line-through">$9,990 /año</div>
                 <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li>• Todas las funciones</li>
-                    <li>• 7 días gratis</li>
-                    <li>• Ahorra 50%</li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Todas las funciones</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>7 días gratis</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Mejor precio</span>
+                    </li>
                 </ul>
             </div>
             
             <button onclick="proceedToCheckout()" 
                     id="payButton"
                     class="w-full px-5 py-3 rounded-2xl bg-slate-900 text-white font-medium shadow hover:shadow-md disabled:opacity-60">
-                Continuar al pago
+                Continuar
             </button>
             
             <p class="text-[11px] text-slate-500 text-center">
-                Pagos procesados con Mercado Pago
+                Los pagos se procesan de forma segura
             </p>
         </div>
         <div id="plansMessage" class="mt-4 hidden"></div>
     `;
 }
 
-let selectedPlan = 'premium_monthly';
-
 window.selectPlan = function(plan) {
     selectedPlan = plan;
     
-    // Visual feedback
+    document.getElementById('planFree').classList.remove('border-slate-900', 'shadow-lg');
     document.getElementById('planMonthly').classList.remove('border-slate-900', 'shadow-lg');
     document.getElementById('planAnnual').classList.remove('border-slate-900', 'shadow-lg');
     
-    if (plan === 'premium_monthly') {
+    document.getElementById('planFree').classList.add('border-slate-300');
+    document.getElementById('planMonthly').classList.add('border-slate-300');
+    document.getElementById('planAnnual').classList.add('border-slate-300');
+    
+    if (plan === 'free') {
+        document.getElementById('planFree').classList.add('border-slate-900', 'shadow-lg');
+        document.getElementById('planFree').classList.remove('border-slate-300');
+        document.getElementById('payButton').textContent = 'Continuar con Plan Gratis';
+    } else if (plan === 'premium_monthly') {
         document.getElementById('planMonthly').classList.add('border-slate-900', 'shadow-lg');
+        document.getElementById('planMonthly').classList.remove('border-slate-300');
+        document.getElementById('payButton').textContent = 'Pagar con Mercado Pago';
     } else {
         document.getElementById('planAnnual').classList.add('border-slate-900', 'shadow-lg');
+        document.getElementById('planAnnual').classList.remove('border-slate-300');
+        document.getElementById('payButton').textContent = 'Pagar con Mercado Pago';
     }
 };
 
 window.proceedToCheckout = async function() {
+    if (selectedPlan === 'free') {
+        // Plan gratis: ir directo a descarga
+        goToDownload();
+        return;
+    }
+    
+    // Premium: mostrar iframe de Mercado Pago EN LA MISMA PÁGINA
     const btn = document.getElementById('payButton');
     btn.disabled = true;
-    btn.textContent = 'Procesando...';
+    btn.textContent = 'Cargando checkout...';
     
     try {
         const response = await fetch(CF_CREATE_SUBSCRIPTION, {
@@ -271,80 +338,118 @@ window.proceedToCheckout = async function() {
         if (!response.ok) throw new Error(data.error);
         
         if (data.subscriptionLink) {
-            showMessage('🔄 Redirigiendo a Mercado Pago...', 'info');
-            setTimeout(() => {
-                window.location.href = data.subscriptionLink;
-            }, 1500);
+            // Mostrar iframe de MercadoPago AQUÍ en la página
+            showMercadoPagoCheckout(data.subscriptionLink);
         } else {
-            // Fallback para demo
-            setTimeout(() => goToDownload(), 1000);
+            throw new Error('No se recibió link de pago');
         }
         
     } catch (error) {
         showMessage('❌ ' + error.message, 'error');
         btn.disabled = false;
-        btn.textContent = 'Continuar al pago';
+        btn.textContent = 'Pagar con Mercado Pago';
     }
 };
+
+function showMercadoPagoCheckout(checkoutUrl) {
+    const container = document.getElementById('formContainer');
+    container.innerHTML = `
+        <div class="rounded-2xl border border-slate-200 bg-white p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">Completa tu pago</h3>
+                <button onclick="goToPlans()" class="text-sm text-slate-600 hover:text-slate-900">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <iframe 
+                src="${checkoutUrl}" 
+                class="w-full h-[600px] rounded-xl border border-slate-300"
+                frameborder="0">
+            </iframe>
+            
+            <p class="text-xs text-slate-500 mt-3 text-center">
+                Pago procesado de forma segura por Mercado Pago
+            </p>
+        </div>
+    `;
+    setTimeout(() => lucide.createIcons(), 100);
+}
 
 function goToDownload() {
     currentStep = 'download';
     updateSteps();
     showDownloadForm();
+    setTimeout(() => lucide.createIcons(), 100);
 }
 
 function showDownloadForm() {
     const container = document.getElementById('formContainer');
     container.innerHTML = `
         <div class="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 class="text-lg font-semibold mb-2">🎉 ¡Listo!</h3>
-            <p class="text-sm text-slate-600 mb-4">
-                Tu cuenta premium está activada. Descarga la app e inicia sesión con tu correo.
-            </p>
-            
-            <div class="flex gap-3 flex-wrap">
-                <a href="https://play.google.com/store" 
-                   class="flex-1 bg-slate-900 text-white px-4 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
-                        <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
-                    </svg>
-                    Google Play
-                </a>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-3 rounded-xl bg-emerald-100">
+                    <i data-lucide="check-circle" class="w-8 h-8 text-emerald-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">¡Listo!</h3>
+                    <p class="text-sm text-slate-600">Tu cuenta está activada</p>
+                </div>
             </div>
             
+            <p class="text-sm text-slate-700 mb-4">
+                Descarga la app e inicia sesión con tu correo.
+            </p>
+            
+            <a href="https://play.google.com/store" 
+               class="w-full bg-slate-900 text-white px-4 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                Descargar para Android
+            </a>
+            
             <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <p class="text-xs text-slate-600">
-                    <strong>📧 Revisa tu email</strong><br>
-                    Te enviamos las instrucciones de acceso y un link directo a la app.
-                </p>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="mail" class="w-5 h-5 text-slate-600 mt-0.5"></i>
+                    <div class="text-xs text-slate-600">
+                        <strong>Revisa tu email</strong><br>
+                        Te enviamos las instrucciones de acceso.
+                    </div>
+                </div>
             </div>
         </div>
     `;
+    setTimeout(() => lucide.createIcons(), 100);
 }
 
 function updateSteps() {
-    const steps = {
-        signup: 1,
-        plans: 2,
-        download: 3
-    };
-    
+    const steps = { signup: 1, plans: 2, download: 3 };
     const current = steps[currentStep];
     
     for (let i = 1; i <= 3; i++) {
         const el = document.getElementById(`step${i}`);
         if (!el) continue;
         
+        const circle = el.querySelector('div');
+        
         if (i === current) {
             el.classList.remove('text-slate-500');
             el.classList.add('text-slate-900');
-            el.querySelector('div').classList.add('bg-slate-900', 'text-white', 'border-slate-900');
-            el.querySelector('div').classList.remove('bg-white', 'border-slate-300');
+            circle.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+            circle.classList.remove('bg-white', 'border-slate-300', 'bg-emerald-500');
+            circle.textContent = i;
         } else if (i < current) {
             el.classList.remove('text-slate-500');
             el.classList.add('text-emerald-600');
-            el.querySelector('div').classList.add('bg-emerald-500', 'text-white');
-            el.querySelector('div').innerHTML = '✓';
+            circle.classList.add('bg-emerald-500', 'text-white');
+            circle.classList.remove('bg-white', 'border-slate-300', 'bg-slate-900');
+            circle.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+            setTimeout(() => lucide.createIcons(), 50);
+        } else {
+            el.classList.add('text-slate-500');
+            el.classList.remove('text-slate-900', 'text-emerald-600');
+            circle.classList.add('bg-white', 'border-slate-300');
+            circle.classList.remove('bg-slate-900', 'bg-emerald-500');
+            circle.textContent = i;
         }
     }
 }
@@ -355,13 +460,19 @@ function showMessage(message, type) {
     containers.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            el.className = `mt-4 p-4 rounded-xl ${
+            el.className = `mt-4 p-4 rounded-xl flex items-start gap-3 ${
                 type === 'success' ? 'bg-green-100 text-green-800 border border-green-300' :
                 type === 'error' ? 'bg-red-100 text-red-800 border border-red-300' :
                 'bg-blue-100 text-blue-800 border border-blue-300'
             }`;
-            el.textContent = message;
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info';
+            el.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 mt-0.5"></i>
+                <span class="text-sm">${message}</span>
+            `;
             el.classList.remove('hidden');
+            setTimeout(() => lucide.createIcons(), 50);
         }
     });
 }

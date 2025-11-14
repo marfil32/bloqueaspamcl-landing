@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BloqueaSpamCL - Activa tu cuenta</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(16px); }
@@ -17,40 +19,34 @@
 </head>
 <body class="bg-gradient-to-b from-white to-slate-50">
     
-    <!-- Contenedor principal estilo mobile -->
     <div class="min-h-screen mx-auto max-w-[420px] border-x border-slate-200 shadow-2xl bg-white">
         
         <!-- Header -->
         <header class="px-4 pt-6 pb-3 text-center">
             <div class="mx-auto w-12 h-12 rounded-2xl bg-slate-900 text-white grid place-items-center mb-2">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2 C8 3.5 5 4.8 5 4.8 V12.5 C5 17 8.2 20.8 12 22 C15.8 20.8 19 17 19 12.5 V4.8 C19 4.8 16 3.5 12 2 Z" 
-                          stroke="#f97316" stroke-width="1.8" fill="none"/>
-                </svg>
+                <i data-lucide="shield" class="w-6 h-6 text-orange-500"></i>
             </div>
             <h1 class="text-2xl font-bold leading-tight tracking-tight">BloqueaSpamCL</h1>
             <p class="text-sm text-slate-600">Activa tu cuenta en 3 pasos</p>
             
-            <!-- Contador promo -->
             <div id="promoCounter" class="mt-2 inline-block px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs">
                 Oferta termina en <span id="countdown">...</span>
             </div>
         </header>
 
-        <!-- Hero con teléfono -->
+        <!-- Hero -->
         <section class="relative h-[280px] mb-2 overflow-hidden">
-            <!-- Fondo degradado -->
             <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"></div>
             
-            <!-- Teléfono con alerta -->
             <div class="relative h-full flex items-center justify-center px-4">
                 <div class="relative w-[190px] h-[380px] rounded-[32px] bg-black/70 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] overflow-hidden">
-                    <!-- Notch -->
                     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 rounded-b-2xl bg-black/90"></div>
                     
-                    <!-- Alerta de llamada bloqueada -->
                     <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[82%] rounded-2xl bg-slate-900/80 backdrop-blur border border-white/10 text-white px-4 py-3">
-                        <div class="text-[11px] text-amber-300 font-semibold tracking-wide">⚠️ Llamada bloqueada</div>
+                        <div class="flex items-center gap-2 text-[11px] text-amber-300 font-semibold tracking-wide">
+                            <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                            Llamada bloqueada
+                        </div>
                         <div class="text-xl font-bold leading-tight mt-0.5">+56 600 XXXX</div>
                         <div class="text-[13px] text-slate-200 mt-0.5">Telemarketing SPAM</div>
                     </div>
@@ -62,19 +58,27 @@
         <section class="px-4 mt-3 mb-4">
             <div class="flex gap-3 overflow-x-auto no-scrollbar">
                 <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
-                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">🛡️</div>
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">
+                        <i data-lucide="shield" class="w-4 h-4"></i>
+                    </div>
                     <span class="whitespace-nowrap">Anti-spam</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
-                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">📵</div>
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">
+                        <i data-lucide="phone-off" class="w-4 h-4"></i>
+                    </div>
                     <span class="whitespace-nowrap">600/809</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
-                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">👥</div>
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
                     <span class="whitespace-nowrap">Lista segura</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
-                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">⚙️</div>
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </div>
                     <span class="whitespace-nowrap">Tiempo real</span>
                 </div>
             </div>
@@ -85,35 +89,53 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-4">
                 <h4 class="font-semibold mb-2">¿Qué obtienes al registrarte?</h4>
                 <ul class="text-sm text-slate-700 space-y-1">
-                    <li>• Bloqueo automático de spam comunitario</li>
-                    <li>• Bloqueo de prefijos 600 y 809</li>
-                    <li>• Modo "Solo Contactos Seguros"</li>
-                    <li>• Estadísticas detalladas</li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Bloqueo automático de spam comunitario</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Bloqueo de prefijos 600 y 809 (Premium)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Modo "Solo Contactos Seguros" (Premium)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <span>Estadísticas detalladas (Premium)</span>
+                    </li>
                 </ul>
             </div>
         </section>
 
-        <!-- Selector de Plataforma (paso 0) -->
+        <!-- Selector de Plataforma -->
         <section id="platformSection" class="px-4 mb-4 fade-in">
             <div class="rounded-2xl border border-slate-200 bg-white p-5">
                 <h3 class="text-lg font-semibold mb-3">¿Qué dispositivo usas?</h3>
                 <div class="space-y-3">
                     <button onclick="selectPlatform('android')" 
                             class="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-slate-300 hover:border-slate-400 bg-white text-left transition">
-                        <div class="text-3xl">📱</div>
+                        <div class="p-2 rounded-lg bg-emerald-100">
+                            <i data-lucide="smartphone" class="w-6 h-6 text-emerald-700"></i>
+                        </div>
                         <div class="flex-1">
                             <div class="font-medium">Android</div>
                             <div class="text-sm text-slate-600">Disponible ahora</div>
                         </div>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400"></i>
                     </button>
                     
                     <button onclick="selectPlatform('ios')" 
                             class="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-slate-300 hover:border-slate-400 bg-white text-left transition">
-                        <div class="text-3xl">🍎</div>
+                        <div class="p-2 rounded-lg bg-slate-100">
+                            <i data-lucide="smartphone" class="w-6 h-6 text-slate-700"></i>
+                        </div>
                         <div class="flex-1">
                             <div class="font-medium">iOS</div>
                             <div class="text-sm text-slate-600">Próximamente</div>
                         </div>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400"></i>
                     </button>
                 </div>
             </div>
@@ -126,16 +148,12 @@
                     <div id="step1" class="flex items-center gap-2 shrink-0 text-slate-900">
                         <div class="w-7 h-7 rounded-full grid place-items-center bg-slate-900 text-white border-slate-900 text-xs">1</div>
                         <span class="whitespace-nowrap">Crea tu cuenta</span>
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400"></i>
                     </div>
                     <div id="step2" class="flex items-center gap-2 shrink-0 text-slate-500">
                         <div class="w-7 h-7 rounded-full grid place-items-center bg-white border border-slate-300 text-xs">2</div>
                         <span class="whitespace-nowrap">Elige tu plan</span>
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400"></i>
                     </div>
                     <div id="step3" class="flex items-center gap-2 shrink-0 text-slate-500">
                         <div class="w-7 h-7 rounded-full grid place-items-center bg-white border border-slate-300 text-xs">3</div>
@@ -158,5 +176,9 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Inicializar Lucide icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

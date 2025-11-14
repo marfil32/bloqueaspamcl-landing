@@ -198,7 +198,7 @@ function showPlansForm() {
                 </div>
                 <ul class="mt-3 space-y-1 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>Bloqueo spam comunitario</span>
                     </li>
                     <li class="flex items-start gap-2 text-slate-400">
@@ -227,15 +227,15 @@ function showPlansForm() {
                 <div class="text-xs text-slate-400 line-through">$2,990 /mes</div>
                 <ul class="mt-3 space-y-1 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>Todas las funciones</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>7 días gratis</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>Cancela cuando quieras</span>
                     </li>
                 </ul>
@@ -256,15 +256,15 @@ function showPlansForm() {
                 <div class="text-xs text-slate-400 line-through">$9,990 /año</div>
                 <ul class="mt-3 space-y-1 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>Todas las funciones</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>7 días gratis</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-emerald-600"></i>
+                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
                         <span>Mejor precio</span>
                     </li>
                 </ul>
@@ -282,6 +282,7 @@ function showPlansForm() {
         </div>
         <div id="plansMessage" class="mt-4 hidden"></div>
     `;
+    setTimeout(() => lucide.createIcons(), 100);
 }
 
 window.selectPlan = function(plan) {
@@ -312,15 +313,14 @@ window.selectPlan = function(plan) {
 
 window.proceedToCheckout = async function() {
     if (selectedPlan === 'free') {
-        // Plan gratis: ir directo a descarga
         goToDownload();
         return;
     }
     
-    // Premium: mostrar iframe de Mercado Pago EN LA MISMA PÁGINA
+    // Premium: REDIRIGIR a MercadoPago (no usar iframe)
     const btn = document.getElementById('payButton');
     btn.disabled = true;
-    btn.textContent = 'Cargando checkout...';
+    btn.textContent = 'Redirigiendo a pago...';
     
     try {
         const response = await fetch(CF_CREATE_SUBSCRIPTION, {
@@ -338,8 +338,11 @@ window.proceedToCheckout = async function() {
         if (!response.ok) throw new Error(data.error);
         
         if (data.subscriptionLink) {
-            // Mostrar iframe de MercadoPago AQUÍ en la página
-            showMercadoPagoCheckout(data.subscriptionLink);
+            // Redirigir a MercadoPago (nueva ventana o misma ventana)
+            showMessage('✅ Redirigiendo a Mercado Pago...', 'success');
+            setTimeout(() => {
+                window.location.href = data.subscriptionLink;
+            }, 1500);
         } else {
             throw new Error('No se recibió link de pago');
         }
@@ -350,31 +353,6 @@ window.proceedToCheckout = async function() {
         btn.textContent = 'Pagar con Mercado Pago';
     }
 };
-
-function showMercadoPagoCheckout(checkoutUrl) {
-    const container = document.getElementById('formContainer');
-    container.innerHTML = `
-        <div class="rounded-2xl border border-slate-200 bg-white p-5">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold">Completa tu pago</h3>
-                <button onclick="goToPlans()" class="text-sm text-slate-600 hover:text-slate-900">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <iframe 
-                src="${checkoutUrl}" 
-                class="w-full h-[600px] rounded-xl border border-slate-300"
-                frameborder="0">
-            </iframe>
-            
-            <p class="text-xs text-slate-500 mt-3 text-center">
-                Pago procesado de forma segura por Mercado Pago
-            </p>
-        </div>
-    `;
-    setTimeout(() => lucide.createIcons(), 100);
-}
 
 function goToDownload() {
     currentStep = 'download';
@@ -435,20 +413,20 @@ function updateSteps() {
             el.classList.remove('text-slate-500');
             el.classList.add('text-slate-900');
             circle.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
-            circle.classList.remove('bg-white', 'border-slate-300', 'bg-emerald-500');
+            circle.classList.remove('bg-white', 'border-slate-300', 'bg-slate-600');
             circle.textContent = i;
         } else if (i < current) {
             el.classList.remove('text-slate-500');
-            el.classList.add('text-emerald-600');
-            circle.classList.add('bg-emerald-500', 'text-white');
+            el.classList.add('text-slate-600');
+            circle.classList.add('bg-slate-600', 'text-white');
             circle.classList.remove('bg-white', 'border-slate-300', 'bg-slate-900');
             circle.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
             setTimeout(() => lucide.createIcons(), 50);
         } else {
             el.classList.add('text-slate-500');
-            el.classList.remove('text-slate-900', 'text-emerald-600');
+            el.classList.remove('text-slate-900', 'text-slate-600');
             circle.classList.add('bg-white', 'border-slate-300');
-            circle.classList.remove('bg-slate-900', 'bg-emerald-500');
+            circle.classList.remove('bg-slate-900', 'bg-slate-600');
             circle.textContent = i;
         }
     }

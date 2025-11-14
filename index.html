@@ -3,234 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bloquea Spam CL - Bloqueo Automático de Llamadas Spam</title>
+    <title>BloqueaSpamCL - Activa tu cuenta</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gradient-to-b from-white to-slate-50">
     
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 py-6">
-            <h1 class="text-3xl font-bold text-gray-900">🛡️ Bloquea Spam CL</h1>
-            <p class="text-gray-600 mt-2">Bloqueo automático de llamadas spam comunitario</p>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="max-w-6xl mx-auto px-4 py-12">
-        <div class="text-center">
-            <h2 class="text-4xl font-bold text-gray-900 mb-4">
-                Nunca más llamadas spam
-            </h2>
-            <p class="text-xl text-gray-600 mb-8">
-                Base de datos comunitaria que bloquea automáticamente números reportados
-            </p>
-        </div>
-
-        <!-- Features -->
-        <div class="grid md:grid-cols-3 gap-6 mb-12">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <div class="text-3xl mb-4">🚫</div>
-                <h3 class="font-bold text-lg mb-2">Bloqueo Automático</h3>
-                <p class="text-gray-600">Números con 3+ reportes se bloquean automáticamente</p>
+    <!-- Contenedor principal estilo mobile -->
+    <div class="min-h-screen mx-auto max-w-[420px] border-x border-slate-200 shadow-2xl bg-white">
+        
+        <!-- Header -->
+        <header class="px-4 pt-6 pb-3 text-center">
+            <div class="mx-auto w-12 h-12 rounded-2xl bg-slate-900 text-white grid place-items-center mb-2">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2 C8 3.5 5 4.8 5 4.8 V12.5 C5 17 8.2 20.8 12 22 C15.8 20.8 19 17 19 12.5 V4.8 C19 4.8 16 3.5 12 2 Z" 
+                          stroke="#f97316" stroke-width="1.8" fill="none"/>
+                </svg>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow">
-                <div class="text-3xl mb-4">👥</div>
-                <h3 class="font-bold text-lg mb-2">Comunitario</h3>
-                <p class="text-gray-600">Base de datos compartida entre todos los usuarios</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow">
-                <div class="text-3xl mb-4">🔒</div>
-                <h3 class="font-bold text-lg mb-2">Sin Notificaciones</h3>
-                <p class="text-gray-600">Bloqueo silencioso, sin interrumpir tu día</p>
-            </div>
-        </div>
-
-        <!-- Requisitos -->
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-12">
-            <h3 class="font-bold text-lg mb-2">📱 Requisitos Mínimos</h3>
-            <ul class="space-y-2 text-gray-700">
-                <li>✅ Android 10 o superior</li>
-                <li>✅ Permisos de teléfono y contactos</li>
-                <li>✅ Conexión a internet (para sincronización)</li>
-                <li>⏳ iOS: Próximamente</li>
-            </ul>
-        </div>
-
-        <!-- Pricing -->
-        <div class="mb-12">
-            <h2 class="text-3xl font-bold text-center mb-8">Planes y Precios</h2>
+            <h1 class="text-2xl font-bold leading-tight tracking-tight">BloqueaSpamCL</h1>
+            <p class="text-sm text-slate-600">Activa tu cuenta en 3 pasos</p>
             
-            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <!-- Plan Gratis -->
-                <div class="bg-white p-8 rounded-lg shadow">
-                    <h3 class="text-2xl font-bold mb-4">Gratis</h3>
-                    <div class="text-4xl font-bold mb-6">$0<span class="text-xl text-gray-600">/mes</span></div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-2">✓</span>
-                            <span>Bloqueo spam comunitario</span>
-                        </li>
-                        <li class="flex items-start text-gray-400">
-                            <span class="mr-2">✗</span>
-                            <span>Bloqueo prefijos 600/809</span>
-                        </li>
-                        <li class="flex items-start text-gray-400">
-                            <span class="mr-2">✗</span>
-                            <span>Modo "Solo Contactos"</span>
-                        </li>
-                        <li class="flex items-start text-gray-400">
-                            <span class="mr-2">✗</span>
-                            <span>Estadísticas</span>
-                        </li>
-                    </ul>
-                </div>
+            <!-- Contador promo -->
+            <div id="promoCounter" class="mt-2 inline-block px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs">
+                Oferta termina en <span id="countdown">...</span>
+            </div>
+        </header>
 
-                <!-- Plan Premium -->
-                <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-8 rounded-lg shadow-xl relative">
-                    <div class="absolute top-4 right-4 bg-yellow-400 text-blue-900 px-3 py-1 rounded-full text-sm font-bold">
-                        OFERTA
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Premium</h3>
-                    <div class="mb-2">
-                        <span class="text-2xl line-through opacity-75">$2,990</span>
-                        <span class="text-4xl font-bold ml-2">$990</span>
-                        <span class="text-xl">/mes</span>
-                    </div>
-                    <p class="text-sm mb-6 opacity-90">Oferta válida hasta 30/nov/2024</p>
+        <!-- Hero con teléfono -->
+        <section class="relative h-[280px] mb-2 overflow-hidden">
+            <!-- Fondo degradado -->
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"></div>
+            
+            <!-- Teléfono con alerta -->
+            <div class="relative h-full flex items-center justify-center px-4">
+                <div class="relative w-[190px] h-[380px] rounded-[32px] bg-black/70 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] overflow-hidden">
+                    <!-- Notch -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 rounded-b-2xl bg-black/90"></div>
                     
-                    <div class="bg-white/20 backdrop-blur-sm p-4 rounded-lg mb-6">
-                        <p class="font-bold mb-2">🎁 7 días gratis de prueba</p>
-                        <p class="text-sm opacity-90">Cancela cuando quieras</p>
-                    </div>
-                    
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-start">
-                            <span class="mr-2">✓</span>
-                            <span>Todo de plan Gratis</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">✓</span>
-                            <span>Bloqueo prefijos 600/809</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">✓</span>
-                            <span>Modo "Solo Contactos Seguros"</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">✓</span>
-                            <span>Lista de bloqueo personalizada</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">✓</span>
-                            <span>Estadísticas detalladas</span>
-                        </li>
-                    </ul>
-
-                    <div class="text-sm opacity-75">
-                        Plan anual: <span class="line-through">$9,990</span> 
-                        <span class="font-bold">$5,990/año</span>
+                    <!-- Alerta de llamada bloqueada -->
+                    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[82%] rounded-2xl bg-slate-900/80 backdrop-blur border border-white/10 text-white px-4 py-3">
+                        <div class="text-[11px] text-amber-300 font-semibold tracking-wide">⚠️ Llamada bloqueada</div>
+                        <div class="text-xl font-bold leading-tight mt-0.5">+56 600 XXXX</div>
+                        <div class="text-[13px] text-slate-200 mt-0.5">Telemarketing SPAM</div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Formulario de Registro -->
-        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold mb-6 text-center">Crear Cuenta</h2>
-            
-            <form id="registrationForm" class="space-y-6">
-                <!-- Email -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Email *
-                    </label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="tu@email.com"
-                    >
+        <!-- Features pills -->
+        <section class="px-4 mt-3 mb-4">
+            <div class="flex gap-3 overflow-x-auto no-scrollbar">
+                <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">🛡️</div>
+                    <span class="whitespace-nowrap">Anti-spam</span>
                 </div>
+                <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">📵</div>
+                    <span class="whitespace-nowrap">600/809</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">👥</div>
+                    <span class="whitespace-nowrap">Lista segura</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm">
+                    <div class="p-1.5 rounded-lg bg-slate-900 text-white">⚙️</div>
+                    <span class="whitespace-nowrap">Tiempo real</span>
+                </div>
+            </div>
+        </section>
 
-                <!-- Sistema Operativo -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        ¿Qué sistema operativo usas? *
-                    </label>
-                    <div class="space-y-2">
-                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="platform" value="android" required class="mr-3">
-                            <div>
-                                <div class="font-medium">📱 Android</div>
-                                <div class="text-sm text-gray-600">Disponible ahora</div>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="platform" value="ios" required class="mr-3">
-                            <div>
-                                <div class="font-medium">🍎 iOS</div>
-                                <div class="text-sm text-gray-600">Próximamente - Lista de espera</div>
-                            </div>
-                        </label>
+        <!-- Beneficios -->
+        <section class="px-4 mb-4">
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                <h4 class="font-semibold mb-2">¿Qué obtienes al registrarte?</h4>
+                <ul class="text-sm text-slate-700 space-y-1">
+                    <li>• Bloqueo automático de spam comunitario</li>
+                    <li>• Bloqueo de prefijos 600 y 809</li>
+                    <li>• Modo "Solo Contactos Seguros"</li>
+                    <li>• Estadísticas detalladas</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Selector de Plataforma (paso 0) -->
+        <section id="platformSection" class="px-4 mb-4 fade-in">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5">
+                <h3 class="text-lg font-semibold mb-3">¿Qué dispositivo usas?</h3>
+                <div class="space-y-3">
+                    <button onclick="selectPlatform('android')" 
+                            class="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-slate-300 hover:border-slate-400 bg-white text-left transition">
+                        <div class="text-3xl">📱</div>
+                        <div class="flex-1">
+                            <div class="font-medium">Android</div>
+                            <div class="text-sm text-slate-600">Disponible ahora</div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="selectPlatform('ios')" 
+                            class="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-slate-300 hover:border-slate-400 bg-white text-left transition">
+                        <div class="text-3xl">🍎</div>
+                        <div class="flex-1">
+                            <div class="font-medium">iOS</div>
+                            <div class="text-sm text-slate-600">Próximamente</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pasos mini -->
+        <section id="stepsSection" class="px-4 mb-4 hidden">
+            <div class="overflow-x-auto no-scrollbar">
+                <div class="flex items-center gap-3 text-sm">
+                    <div id="step1" class="flex items-center gap-2 shrink-0 text-slate-900">
+                        <div class="w-7 h-7 rounded-full grid place-items-center bg-slate-900 text-white border-slate-900 text-xs">1</div>
+                        <span class="whitespace-nowrap">Crea tu cuenta</span>
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <div id="step2" class="flex items-center gap-2 shrink-0 text-slate-500">
+                        <div class="w-7 h-7 rounded-full grid place-items-center bg-white border border-slate-300 text-xs">2</div>
+                        <span class="whitespace-nowrap">Elige tu plan</span>
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <div id="step3" class="flex items-center gap-2 shrink-0 text-slate-500">
+                        <div class="w-7 h-7 rounded-full grid place-items-center bg-white border border-slate-300 text-xs">3</div>
+                        <span class="whitespace-nowrap">Descarga</span>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- Plan -->
-                <div id="planSection" style="display: none;">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Selecciona tu plan *
-                    </label>
-                    <div class="space-y-2">
-                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="plan" value="free" class="mr-3">
-                            <div class="flex-1">
-                                <div class="font-medium">Gratis</div>
-                                <div class="text-sm text-gray-600">Solo bloqueo comunitario</div>
-                            </div>
-                            <div class="font-bold">$0</div>
-                        </label>
-                        <label class="flex items-center p-4 border-2 border-blue-500 rounded-lg cursor-pointer bg-blue-50">
-                            <input type="radio" name="plan" value="premium_monthly" class="mr-3">
-                            <div class="flex-1">
-                                <div class="font-medium">Premium Mensual 🎁</div>
-                                <div class="text-sm text-gray-600">7 días gratis • Oferta hasta 30/nov</div>
-                            </div>
-                            <div>
-                                <div class="text-sm line-through text-gray-500">$2,990</div>
-                                <div class="font-bold text-blue-600">$990/mes</div>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border-2 border-green-500 rounded-lg cursor-pointer bg-green-50">
-                            <input type="radio" name="plan" value="premium_annual" class="mr-3">
-                            <div class="flex-1">
-                                <div class="font-medium">Premium Anual 💎</div>
-                                <div class="text-sm text-gray-600">7 días gratis • Ahorra $5,000</div>
-                            </div>
-                            <div>
-                                <div class="text-sm line-through text-gray-500">$9,990</div>
-                                <div class="font-bold text-green-600">$5,990/año</div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
+        <!-- Contenedor de formularios -->
+        <main class="px-4 pb-16">
+            <div id="formContainer" class="fade-in"></div>
+        </main>
 
-                <!-- Botón Submit -->
-                <button 
-                    type="submit" 
-                    id="submitBtn"
-                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
-                >
-                    Continuar
-                </button>
-            </form>
+        <!-- Footer -->
+        <footer class="px-4 pb-10 text-xs text-slate-500 text-center">
+            © 2024 BloqueaSpamCL. Todos los derechos reservados.
+        </footer>
 
-            <!-- Mensaje de resultado -->
-            <div id="resultMessage" class="mt-4 hidden"></div>
-        </div>
-    </section>
+    </div>
 
     <script src="script.js"></script>
 </body>

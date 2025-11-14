@@ -2,7 +2,6 @@ const CF_CREATE_MEMBERSHIP = 'https://us-central1-bloqueaspamcl-29064.cloudfunct
 const CF_CREATE_SUBSCRIPTION = 'https://us-central1-bloqueaspamcl-29064.cloudfunctions.net/createSubscription';
 const CF_CHECK_USER = 'https://us-central1-bloqueaspamcl-29064.cloudfunctions.net/checkUser';
 
-// Al cargar la página, verificar si hay email en URL
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const emailFromUrl = urlParams.get('email');
@@ -10,13 +9,21 @@ window.addEventListener('DOMContentLoaded', () => {
     if (emailFromUrl) {
         document.getElementById('email').value = emailFromUrl;
         document.getElementById('email').readOnly = true;
-        
-        // Verificar si usuario existe
         checkExistingUser(emailFromUrl);
     }
 });
 
-// Verificar usuario existente
+document.querySelectorAll('input[name="platform"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        const planSection = document.getElementById('planSection');
+        if (e.target.value === 'android') {
+            planSection.style.display = 'block';
+        } else {
+            planSection.style.display = 'none';
+        }
+    });
+});
+
 async function checkExistingUser(email) {
     try {
         const response = await fetch(CF_CHECK_USER, {
@@ -28,7 +35,6 @@ async function checkExistingUser(email) {
         const data = await response.json();
         
         if (data.exists && data.membershipType === 'free') {
-            // Usuario existe con plan FREE
             showUpgradeOptions();
         }
     } catch (error) {
@@ -37,12 +43,11 @@ async function checkExistingUser(email) {
 }
 
 function showUpgradeOptions() {
-    // Ocultar opciones de autenticación
     document.getElementById('passwordSection').style.display = 'none';
-    document.getElementById('googleSignInBtn').style.display = 'none';
+    const googleBtn = document.getElementById('googleSignInBtn');
+    if (googleBtn) googleBtn.style.display = 'none';
     document.getElementById('submitBtn').textContent = 'Actualizar a Premium';
     
-    // Mostrar mensaje
     const infoDiv = document.createElement('div');
     infoDiv.className = 'bg-blue-50 border-l-4 border-blue-500 p-4 mb-4';
     infoDiv.innerHTML = `
@@ -54,7 +59,6 @@ function showUpgradeOptions() {
     form.insertBefore(infoDiv, form.firstChild);
 }
 
-// Manejar envío del formulario
 document.getElementById('registrationForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -63,14 +67,12 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
     const platform = document.querySelector('input[name="platform"]:checked')?.value;
     const plan = document.querySelector('input[name="plan"]:checked')?.value;
     
-    // Si es usuario existente queriendo upgrade
     const isReadOnly = document.getElementById('email').readOnly;
     if (isReadOnly && plan && plan !== 'free') {
         await handleUpgrade(email, plan);
         return;
     }
     
-    // Si es usuario nuevo
     await handleNewUser(email, password, platform, plan);
 });
 
@@ -86,14 +88,13 @@ async function handleNewUser(email, password, platform, plan) {
         } else if (plan === 'free') {
             await createAccount(email, password, platform, 'email', 'free');
             showMessage(
-                `✅ ¡Cuenta creada!
+                `✅ ¡Cuenta creada exitosamente!
                 
-                Revisa tu email para los próximos pasos.
-                Descarga la app e inicia sesión con tus credenciales.`,
+                📧 Revisa tu email para los próximos pasos.
+                📱 Descarga la app e inicia sesión con tus credenciales.`,
                 'success'
             );
         } else {
-            // Premium
             await createSubscription(email, password, platform, plan);
         }
     } catch (error) {
@@ -141,7 +142,6 @@ async function createSubscription(email, password, platform, plan) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     
-    // Redirigir a MercadoPago
     if (data.subscriptionLink) {
         showMessage('🔄 Redirigiendo a pago...', 'info');
         setTimeout(() => {
@@ -165,21 +165,23 @@ function showMessage(message, type) {
     resultMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Botón Google
-document.getElementById('googleSignInBtn')?.addEventListener('click', async () => {
-    const email = document.getElementById('email').value;
-    const platform = document.querySelector('input[name="platform"]:checked')?.value;
-    const plan = document.querySelector('input[name="plan"]:checked')?.value;
-    
-    if (!email || !platform) {
-        showMessage('⚠️ Completa email y plataforma', 'warning');
-        return;
-    }
-    
-    try {
-        await createAccount(email, null, platform, 'google', plan || 'free');
-        showMessage('✅ Pre-registro exitoso. Revisa tu email.', 'success');
-    } catch (error) {
-        showMessage('❌ ' + error.message, 'error');
-    }
-});
+const googleBtn = document.getElementById('googleSignInBtn');
+if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+        const email = document.getElementById('email').value;
+        const platform = document.querySelector('input[name="platform"]:checked')?.value;
+        const plan = document.querySelector('input[name="plan"]:checked')?.value;
+        
+        if (!email || !platform) {
+            showMessage('⚠️ Completa email y plataforma', 'warning');
+            return;
+        }
+        
+        try {
+            await createAccount(email, null, platform, 'google', plan || 'free');
+            showMessage('✅ Pre-registro exitoso. Revisa tu email para los próximos pasos.', 'success');
+        } catch (error) {
+            showMessage('❌ ' + error.message, 'error');
+        }
+    });
+}

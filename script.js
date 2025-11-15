@@ -3,7 +3,7 @@ const CF_CREATE_SUBSCRIPTION = 'https://us-central1-bloqueaspamcl-29064.cloudfun
 const CF_CHECK_USER = 'https://us-central1-bloqueaspamcl-29064.cloudfunctions.net/checkUser';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCMU_2azbqV_y5avAXJsXLjWnf5amO7rCI",
+  apiKey: "AIzaSyCLZ0dpw_yDwXvtPVGNDPEcUYQh6h7VKrA",
   authDomain: "bloqueaspamcl-29064.firebaseapp.com",
   projectId: "bloqueaspamcl-29064",
   storageBucket: "bloqueaspamcl-29064.firebasestorage.app",
@@ -15,9 +15,8 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 googleProvider.setCustomParameters({
-  prompt: 'select_account'  // Fuerza selector de cuenta
+  prompt: 'select_account'  // Siempre muestra selector de cuentas de Google
 });
-
 
 let selectedPlatform = null;
 let currentStep = 'platform';
@@ -482,44 +481,27 @@ window.signInWithGoogle = async function() {
         console.log('✅ Usuario autenticado con Google:', user.email);
         userEmail = user.email;
         
-        btn.textContent = 'Verificando cuenta...';
+        btn.textContent = 'Creando cuenta...';
         
-        // Verificar si el usuario ya existe
-        const checkResponse = await fetch(CF_CHECK_USER, {
+        // Siempre llamar a createMembership (la función maneja duplicados)
+        const response = await fetch(CF_CREATE_MEMBERSHIP, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: user.email })
+            body: JSON.stringify({ 
+                email: user.email,
+                platform: selectedPlatform,
+                authMethod: 'google',
+                plan: 'free'
+            })
         });
         
-        const userData = await checkResponse.json();
-        console.log('📊 Estado de usuario:', userData);
+        const data = await response.json();
         
-        // Si no existe, crear la cuenta
-        if (!userData.exists) {
-            console.log('📝 Creando nueva cuenta...');
-            btn.textContent = 'Creando cuenta...';
-            
-            const response = await fetch(CF_CREATE_MEMBERSHIP, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    email: user.email,
-                    platform: selectedPlatform,
-                    authMethod: 'google',
-                    plan: 'free'
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al crear cuenta');
-            }
-            
-            console.log('✅ Cuenta creada exitosamente');
-        } else {
-            console.log('✅ Usuario ya existe, continuando...');
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al crear cuenta');
         }
+        
+        console.log('✅ Cuenta procesada exitosamente');
         
         showMessage('✅ Conectado con Google. Selecciona tu plan...', 'success');
         setTimeout(() => {
@@ -569,7 +551,7 @@ function showPlansForm() {
                     <ul class="text-xs space-y-1.5 text-slate-700">
                         <li class="flex items-start gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
-                            <span>Bloqueo spam comunitario</span>
+                            <span>Bloqueo spam desde base de datos</span>
                         </li>
                     </ul>
                 </div>
@@ -690,7 +672,7 @@ function showUpgradePlansOnly() {
                     <ul class="text-xs space-y-1.5 text-slate-700">
                         <li class="flex items-start gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
-                            <span>Bloqueo spam comunitario</span>
+                            <span>Bloqueo spam desde base de datos</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>

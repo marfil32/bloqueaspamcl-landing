@@ -142,17 +142,60 @@ function showIOSWaitlist() {
 window.submitIOSWaitlist = async function(e) {
     e.preventDefault();
     const email = document.getElementById('iosEmail').value;
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Registrando...</span>';
     
     try {
-        await fetch(CF_CREATE_MEMBERSHIP, {
+        const response = await fetch(CF_CREATE_MEMBERSHIP, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, platform: 'ios', authMethod: 'email' })
         });
         
-        showMessage('✅ ¡Listo! Te avisaremos cuando esté disponible para iOS.', 'success');
-    } catch {
-        showMessage('❌ Error. Intenta nuevamente.', 'error');
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al registrarse');
+        }
+        
+        // Mostrar mensaje de éxito
+        const container = document.getElementById('formContainer');
+        container.innerHTML = `
+            <div class="rounded-2xl border border-slate-200 bg-white p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-3 rounded-xl bg-emerald-100">
+                        <i data-lucide="check-circle" class="w-8 h-8 text-emerald-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">¡Listo!</h3>
+                        <p class="text-sm text-slate-600">Estás en la lista de espera</p>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <p class="text-sm text-slate-700 mb-2">
+                        <strong>Email confirmado:</strong><br>
+                        ${email}
+                    </p>
+                    <p class="text-xs text-slate-600">
+                        Te notificaremos cuando la app para iOS esté lista.
+                    </p>
+                </div>
+            </div>
+        `;
+        document.getElementById('platformSection').classList.add('hidden');
+        document.getElementById('stepsSection').classList.add('hidden');
+        setTimeout(() => lucide.createIcons(), 100);
+        
+    } catch (error) {
+        showMessage('❌ ' + error.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        setTimeout(() => lucide.createIcons(), 100);
     }
 };
 
@@ -356,14 +399,36 @@ window.loginWithEmail = async function(e) {
 
 window.signInWithGoogle = async function() {
     const btn = document.getElementById('googleSignInButton');
+    if (!btn) {
+        console.error('❌ Botón de Google no encontrado');
+        return;
+    }
+    
+    const originalText = btn.innerHTML;
     btn.disabled = true;
-    btn.textContent = 'Conectando con Google...';
+    btn.textContent = 'Abriendo Google...';
     
     try {
+        console.log('🔍 Iniciando Google Sign-In...');
+        
+        // Verificar que Firebase Auth está disponible
+        if (typeof auth === 'undefined' || typeof googleProvider === 'undefined') {
+            throw new Error('Firebase Auth no está inicializado correctamente');
+        }
+        
+        console.log('✅ Firebase Auth disponible');
+        btn.textContent = 'Conectando con Google...';
+        
+        // Popup de Google (REAL, no simulado)
         const result = await auth.signInWithPopup(googleProvider);
         const user = result.user;
+        
+        console.log('✅ Usuario autenticado con Google:', user.email);
         userEmail = user.email;
         
+        btn.textContent = 'Verificando cuenta...';
+        
+        // Verificar si el usuario ya existe
         const checkResponse = await fetch(CF_CHECK_USER, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -371,8 +436,13 @@ window.signInWithGoogle = async function() {
         });
         
         const userData = await checkResponse.json();
+        console.log('📊 Estado de usuario:', userData);
         
+        // Si no existe, crear la cuenta
         if (!userData.exists) {
+            console.log('📝 Creando nueva cuenta...');
+            btn.textContent = 'Creando cuenta...';
+            
             const response = await fetch(CF_CREATE_MEMBERSHIP, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -389,6 +459,10 @@ window.signInWithGoogle = async function() {
             if (!response.ok) {
                 throw new Error(data.error || 'Error al crear cuenta');
             }
+            
+            console.log('✅ Cuenta creada exitosamente');
+        } else {
+            console.log('✅ Usuario ya existe, continuando...');
         }
         
         showMessage('✅ Conectado con Google. Selecciona tu plan...', 'success');
@@ -399,9 +473,23 @@ window.signInWithGoogle = async function() {
         }, 1500);
         
     } catch (error) {
-        showMessage('❌ ' + error.message, 'error');
+        console.error('❌ Error en Google Sign-In:', error);
+        
+        let errorMessage = error.message;
+        
+        // Mensajes de error específicos
+        if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = 'Cancelaste el inicio de sesión con Google';
+        } else if (error.code === 'auth/popup-blocked') {
+            errorMessage = 'El navegador bloqueó el popup. Permite popups para este sitio.';
+        } else if (error.code === 'auth/unauthorized-domain') {
+            errorMessage = 'Este dominio no está autorizado en Firebase. Contacta al administrador.';
+        }
+        
+        showMessage('❌ ' + errorMessage, 'error');
         btn.disabled = false;
-        btn.textContent = 'Continuar con Google';
+        btn.innerHTML = originalText;
+        setTimeout(() => lucide.createIcons(), 100);
     }
 };
 

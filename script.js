@@ -196,29 +196,49 @@ function showSignupForm() {
                            placeholder="Mínimo 6 caracteres"
                            class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
                 </div>
-                <button type="submit" 
+                <button type="submit" id="signupButton"
                         class="w-full rounded-xl bg-slate-900 text-white px-4 py-2 font-medium">
                     Crear cuenta
                 </button>
             </form>
             
-            <p class="text-xs text-slate-500 mt-3">
-                ¿Ya tienes cuenta? <button onclick="showLoginForm()" class="text-blue-600 hover:underline">Inicia sesión</button>
-            </p>
-            
-            <p class="text-xs text-slate-500 mt-2">
-                Al continuar aceptas los Términos y la Política de Privacidad.
-            </p>
+            <div class="mt-4 text-center">
+                <button onclick="showLoginForm()" class="text-sm text-slate-600 hover:text-slate-900">
+                    ¿Ya tienes cuenta? <span class="font-medium">Inicia sesión</span>
+                </button>
+            </div>
         </div>
         <div id="signupMessage" class="mt-4 hidden"></div>
     `;
+    setTimeout(() => lucide.createIcons(), 100);
 }
 
-window.showLoginForm = function() {
+function showLoginForm() {
     const container = document.getElementById('formContainer');
     container.innerHTML = `
         <div class="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 class="text-lg font-semibold mb-2">Inicia sesión</h3>
+            
+            <button onclick="signInWithGoogle()" 
+                    id="googleSignInButton"
+                    class="w-full flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-300 hover:border-slate-400 px-4 py-2 text-slate-800 font-medium mb-4">
+                <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continuar con Google
+            </button>
+            
+            <div class="relative my-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-slate-500">O</span>
+                </div>
+            </div>
             
             <form onsubmit="loginWithEmail(event)" class="space-y-3">
                 <div>
@@ -233,43 +253,104 @@ window.showLoginForm = function() {
                            placeholder="Tu contraseña"
                            class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
                 </div>
-                <button type="submit" 
+                <button type="submit" id="loginButton"
                         class="w-full rounded-xl bg-slate-900 text-white px-4 py-2 font-medium">
                     Iniciar sesión
                 </button>
             </form>
             
-            <p class="text-xs text-slate-500 mt-3">
-                ¿No tienes cuenta? <button onclick="showSignupForm()" class="text-blue-600 hover:underline">Créala aquí</button>
-            </p>
+            <div class="mt-4 text-center">
+                <button onclick="showSignupForm()" class="text-sm text-slate-600 hover:text-slate-900">
+                    ¿No tienes cuenta? <span class="font-medium">Regístrate</span>
+                </button>
+            </div>
         </div>
         <div id="loginMessage" class="mt-4 hidden"></div>
     `;
+    setTimeout(() => lucide.createIcons(), 100);
+}
+
+window.signUpWithEmail = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const btn = document.getElementById('signupButton');
+    
+    btn.disabled = true;
+    btn.textContent = 'Creando cuenta...';
+    
+    try {
+        const response = await fetch(CF_CREATE_MEMBERSHIP, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                email, 
+                password, 
+                platform: selectedPlatform,
+                authMethod: 'email',
+                plan: 'free'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al crear cuenta');
+        }
+        
+        await auth.signInWithEmailAndPassword(email, password);
+        userEmail = email;
+        
+        showMessage('✅ Cuenta creada. Selecciona tu plan...', 'success');
+        setTimeout(() => {
+            currentStep = 'plans';
+            updateSteps();
+            showPlansForm();
+        }, 1500);
+        
+    } catch (error) {
+        showMessage('❌ ' + error.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Crear cuenta';
+    }
 };
 
 window.loginWithEmail = async function(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginButton');
+    
+    btn.disabled = true;
+    btn.textContent = 'Iniciando sesión...';
     
     try {
+        const checkResponse = await fetch(CF_CHECK_USER, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        
+        const userData = await checkResponse.json();
+        
+        if (!userData.exists) {
+            throw new Error('Usuario no encontrado. Regístrate primero.');
+        }
+        
         await auth.signInWithEmailAndPassword(email, password);
         userEmail = email;
         
-        showMessage('✅ Sesión iniciada correctamente', 'success');
-        setTimeout(() => goToPlans(), 1500);
+        showMessage('✅ Sesión iniciada. Selecciona tu plan...', 'success');
+        setTimeout(() => {
+            currentStep = 'plans';
+            updateSteps();
+            showPlansForm();
+        }, 1500);
         
     } catch (error) {
-        const loginMessage = document.getElementById('loginMessage');
-        if (loginMessage) {
-            loginMessage.className = 'mt-4 p-4 rounded-xl flex items-start gap-3 bg-red-100 text-red-800 border border-red-300';
-            loginMessage.innerHTML = `
-                <i data-lucide="alert-circle" class="w-5 h-5 mt-0.5"></i>
-                <span class="text-sm">Email o contraseña incorrectos</span>
-            `;
-            loginMessage.classList.remove('hidden');
-            setTimeout(() => lucide.createIcons(), 50);
-        }
+        showMessage('❌ ' + error.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Iniciar sesión';
     }
 };
 
@@ -280,160 +361,246 @@ window.signInWithGoogle = async function() {
     
     try {
         const result = await auth.signInWithPopup(googleProvider);
-        currentUser = result.user;
-        userEmail = result.user.email;
+        const user = result.user;
+        userEmail = user.email;
         
-        console.log('✅ Login con Google exitoso:', userEmail);
-        
-        await fetch(CF_CREATE_MEMBERSHIP, {
+        const checkResponse = await fetch(CF_CHECK_USER, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                email: userEmail,
-                platform: selectedPlatform,
-                authMethod: 'google',
-                plan: 'free'
-            })
+            body: JSON.stringify({ email: user.email })
         });
         
-        goToPlans();
+        const userData = await checkResponse.json();
+        
+        if (!userData.exists) {
+            const response = await fetch(CF_CREATE_MEMBERSHIP, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: user.email,
+                    platform: selectedPlatform,
+                    authMethod: 'google',
+                    plan: 'free'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al crear cuenta');
+            }
+        }
+        
+        showMessage('✅ Conectado con Google. Selecciona tu plan...', 'success');
+        setTimeout(() => {
+            currentStep = 'plans';
+            updateSteps();
+            showPlansForm();
+        }, 1500);
         
     } catch (error) {
-        console.error('Error con Google:', error);
-        showMessage('❌ Error al iniciar sesión con Google', 'error');
+        showMessage('❌ ' + error.message, 'error');
         btn.disabled = false;
         btn.textContent = 'Continuar con Google';
     }
 };
 
-window.signUpWithEmail = async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPassword').value;
-    
-    try {
-        const response = await fetch(CF_CREATE_MEMBERSHIP, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                email, 
-                password, 
-                platform: selectedPlatform, 
-                authMethod: 'email',
-                plan: 'free'
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            // Si el error es "cuenta ya existe", ofrecer login
-            if (data.error && data.error.includes('ya está registrado')) {
-                const signupMessage = document.getElementById('signupMessage');
-                if (signupMessage) {
-                    signupMessage.className = 'mt-4 p-4 rounded-xl bg-blue-100 text-blue-800 border border-blue-300';
-                    signupMessage.innerHTML = `
-                        <p class="text-sm">Esta cuenta ya existe.</p>
-                        <button onclick="showLoginForm()" class="mt-2 text-sm font-medium underline">
-                            Iniciar sesión
-                        </button>
-                    `;
-                    signupMessage.classList.remove('hidden');
-                }
-                return;
-            }
+function showPlansForm() {
+    const container = document.getElementById('formContainer');
+    container.innerHTML = `
+        <div class="rounded-2xl border border-slate-200 bg-white p-5">
+            <h3 class="text-lg font-semibold mb-2">Selecciona tu plan</h3>
+            <p class="text-sm text-slate-600 mb-4">Promoción especial hasta el 30 de noviembre</p>
             
-            throw new Error(data.error);
-        }
-        
-        // Login automático
-        await auth.signInWithEmailAndPassword(email, password);
-        
-        userEmail = email;
-        showMessage('✅ Cuenta creada. Revisa tu email.', 'success');
-        
-        setTimeout(() => goToPlans(), 2000);
-        
-    } catch (error) {
-        showMessage('❌ ' + error.message, 'error');
-    }
-};
-
-function goToPlans() {
-    currentStep = 'plans';
-    updateSteps();
-    showPlansForm();
+            <div class="space-y-3 mb-4">
+                <div id="planFree" onclick="selectPlan('free')" 
+                     class="p-4 rounded-xl border-2 border-slate-900 shadow-lg cursor-pointer hover:shadow-xl transition">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h4 class="font-semibold">Plan Gratis</h4>
+                            <p class="text-2xl font-bold mt-1">$0<span class="text-sm font-normal text-slate-600">/mes</span></p>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs rounded-full font-medium">Gratis</span>
+                    </div>
+                    <ul class="text-xs space-y-1.5 text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Bloqueo spam comunitario</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div id="planMonthly" onclick="selectPlan('premium_monthly')" 
+                     class="p-4 rounded-xl border-2 border-slate-300 cursor-pointer hover:shadow-lg transition">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h4 class="font-semibold">Premium Mensual</h4>
+                            <p class="text-2xl font-bold mt-1">
+                                $990<span class="text-sm font-normal text-slate-600">/mes</span>
+                            </p>
+                            <p class="text-xs text-slate-500 line-through">Antes: $2,990/mes</p>
+                        </div>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">-67%</span>
+                    </div>
+                    <ul class="text-xs space-y-1.5 text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Todo lo del plan gratis</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Bloqueo prefijos 600/809</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Modo "Solo Contactos Seguros"</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Lista de bloqueo personalizada</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Estadísticas detalladas</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">7 días de prueba gratis</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div id="planAnnual" onclick="selectPlan('premium_annual')" 
+                     class="p-4 rounded-xl border-2 border-slate-300 cursor-pointer hover:shadow-lg transition">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h4 class="font-semibold">Premium Anual</h4>
+                            <p class="text-2xl font-bold mt-1">
+                                $5,990<span class="text-sm font-normal text-slate-600">/año</span>
+                            </p>
+                            <p class="text-xs text-slate-500 line-through">Antes: $9,990/año</p>
+                        </div>
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">-40%</span>
+                    </div>
+                    <ul class="text-xs space-y-1.5 text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Todo lo del plan Premium</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="trending-down" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">Ahorra $5,900 al año</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">7 días de prueba gratis</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button onclick="proceedToCheckout()" 
+                    id="payButton"
+                    class="w-full px-5 py-3 rounded-2xl bg-slate-900 text-white font-medium shadow hover:shadow-md disabled:opacity-60">
+                Continuar con Plan Gratis
+            </button>
+            
+            <p class="text-[11px] text-slate-500 text-center mt-3">
+                Los pagos se procesan de forma segura
+            </p>
+        </div>
+        <div id="plansMessage" class="mt-4 hidden"></div>
+    `;
     setTimeout(() => lucide.createIcons(), 100);
 }
 
+// NUEVA FUNCIÓN: Mostrar solo planes premium para upgrade
 function showUpgradePlansOnly() {
     const container = document.getElementById('formContainer');
     container.innerHTML = `
-        <div class="rounded-2xl border border-blue-200 bg-blue-50 p-4 mb-4">
-            <div class="flex items-start gap-3">
-                <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5"></i>
-                <div class="text-sm text-blue-800">
-                    <strong>¡Bienvenido de vuelta!</strong><br>
-                    Ya tienes una cuenta con plan Gratis. Selecciona un plan Premium para actualizar.
-                </div>
-            </div>
-        </div>
-        
-        <div class="space-y-4">
-            <div onclick="selectPlan('premium_monthly')" 
-                 id="planMonthly"
-                 class="relative rounded-3xl border-2 border-slate-900 shadow-lg p-5 cursor-pointer bg-white transition">
-                <div class="absolute -top-3 left-5 px-3 py-1 rounded-full text-[11px] bg-amber-100 border border-amber-300 text-amber-900">
-                    Ahorra $2,000
-                </div>
-                <h3 class="text-base font-semibold">Premium Mensual</h3>
-                <div class="mt-2 flex items-end gap-2">
-                    <span class="text-2xl font-bold">$990</span>
-                    <span class="text-slate-500">/mes</span>
-                </div>
-                <div class="text-xs text-slate-400 line-through">$2,990 /mes</div>
-                <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Todas las funciones</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>7 días gratis</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Cancela cuando quieras</span>
-                    </li>
-                </ul>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5">
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold">Actualiza a Premium</h3>
+                <p class="text-sm text-slate-600">¡Hola! Desbloquea todas las funciones</p>
             </div>
             
-            <div onclick="selectPlan('premium_annual')" 
-                 id="planAnnual"
-                 class="relative rounded-3xl border-2 border-slate-300 p-5 cursor-pointer hover:border-slate-400 bg-white transition">
-                <div class="absolute -top-3 right-5 px-3 py-1 rounded-full text-[11px] bg-emerald-100 border border-emerald-300 text-emerald-900">
-                    Ahorra $4,000
+            <div class="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-200">
+                <p class="text-xs text-blue-800">
+                    <strong>Cuenta actual:</strong> ${userEmail}
+                </p>
+            </div>
+            
+            <div class="space-y-3 mb-4">
+                <div id="planMonthly" onclick="selectPlan('premium_monthly')" 
+                     class="p-4 rounded-xl border-2 border-slate-900 shadow-lg cursor-pointer hover:shadow-xl transition">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h4 class="font-semibold">Premium Mensual</h4>
+                            <p class="text-2xl font-bold mt-1">
+                                $990<span class="text-sm font-normal text-slate-600">/mes</span>
+                            </p>
+                            <p class="text-xs text-slate-500 line-through">Antes: $2,990/mes</p>
+                        </div>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">-67%</span>
+                    </div>
+                    <ul class="text-xs space-y-1.5 text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Bloqueo spam comunitario</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Bloqueo prefijos 600/809</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Modo "Solo Contactos Seguros"</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Lista de bloqueo personalizada</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Estadísticas detalladas</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">7 días de prueba gratis</span>
+                        </li>
+                    </ul>
                 </div>
-                <h3 class="text-base font-semibold">Premium Anual</h3>
-                <div class="mt-2 flex items-end gap-2">
-                    <span class="text-2xl font-bold">$5,990</span>
-                    <span class="text-slate-500">/año</span>
+                
+                <div id="planAnnual" onclick="selectPlan('premium_annual')" 
+                     class="p-4 rounded-xl border-2 border-slate-300 cursor-pointer hover:shadow-lg transition">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h4 class="font-semibold">Premium Anual</h4>
+                            <p class="text-2xl font-bold mt-1">
+                                $5,990<span class="text-sm font-normal text-slate-600">/año</span>
+                            </p>
+                            <p class="text-xs text-slate-500 line-through">Antes: $9,990/año</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium block mb-1">-40%</span>
+                            <span class="text-xs text-emerald-700 font-medium">Mejor precio</span>
+                        </div>
+                    </div>
+                    <ul class="text-xs space-y-1.5 text-slate-700">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span>Todo lo del plan Premium</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="trending-down" class="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">Ahorra $5,900 al año</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">7 días de prueba gratis</span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="text-xs text-slate-400 line-through">$9,990 /año</div>
-                <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Todas las funciones</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>7 días gratis</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Mejor precio</span>
-                    </li>
-                </ul>
             </div>
             
             <button onclick="proceedToCheckout()" 
@@ -441,109 +608,16 @@ function showUpgradePlansOnly() {
                     class="w-full px-5 py-3 rounded-2xl bg-slate-900 text-white font-medium shadow hover:shadow-md disabled:opacity-60">
                 Pagar con Mercado Pago
             </button>
-        </div>
-    `;
-    
-    selectedPlan = 'premium_monthly';
-    setTimeout(() => lucide.createIcons(), 100);
-}
-
-function showPlansForm() {
-    const container = document.getElementById('formContainer');
-    container.innerHTML = `
-        <div class="space-y-4">
-            <div onclick="selectPlan('free')" 
-                 id="planFree"
-                 class="relative rounded-3xl border-2 border-slate-900 shadow-lg p-5 cursor-pointer bg-white transition">
-                <h3 class="text-base font-semibold">Plan Gratis</h3>
-                <div class="mt-2 flex items-end gap-2">
-                    <span class="text-2xl font-bold">$0</span>
-                    <span class="text-slate-500">/mes</span>
-                </div>
-                <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Bloqueo spam comunitario</span>
-                    </li>
-                    <li class="flex items-start gap-2 text-slate-400">
-                        <i data-lucide="x" class="w-4 h-4 mt-0.5"></i>
-                        <span>Sin bloqueo 600/809</span>
-                    </li>
-                    <li class="flex items-start gap-2 text-slate-400">
-                        <i data-lucide="x" class="w-4 h-4 mt-0.5"></i>
-                        <span>Sin lista segura</span>
-                    </li>
-                </ul>
-            </div>
             
-            <div onclick="selectPlan('premium_monthly')" 
-                 id="planMonthly"
-                 class="relative rounded-3xl border-2 border-slate-300 p-5 cursor-pointer hover:border-slate-400 bg-white transition">
-                <div class="absolute -top-3 left-5 px-3 py-1 rounded-full text-[11px] bg-amber-100 border border-amber-300 text-amber-900">
-                    Ahorra $2,000
-                </div>
-                <h3 class="text-base font-semibold">Premium Mensual</h3>
-                <div class="mt-2 flex items-end gap-2">
-                    <span class="text-2xl font-bold">$990</span>
-                    <span class="text-slate-500">/mes</span>
-                </div>
-                <div class="text-xs text-slate-400 line-through">$2,990 /mes</div>
-                <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Todas las funciones</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>7 días gratis</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Cancela cuando quieras</span>
-                    </li>
-                </ul>
-            </div>
-            
-            <div onclick="selectPlan('premium_annual')" 
-                 id="planAnnual"
-                 class="relative rounded-3xl border-2 border-slate-300 p-5 cursor-pointer hover:border-slate-400 bg-white transition">
-                <div class="absolute -top-3 right-5 px-3 py-1 rounded-full text-[11px] bg-emerald-100 border border-emerald-300 text-emerald-900">
-                    Ahorra $4,000
-                </div>
-                <h3 class="text-base font-semibold">Premium Anual</h3>
-                <div class="mt-2 flex items-end gap-2">
-                    <span class="text-2xl font-bold">$5,990</span>
-                    <span class="text-slate-500">/año</span>
-                </div>
-                <div class="text-xs text-slate-400 line-through">$9,990 /año</div>
-                <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Todas las funciones</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>7 días gratis</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i data-lucide="check" class="w-4 h-4 mt-0.5 text-slate-900"></i>
-                        <span>Mejor precio</span>
-                    </li>
-                </ul>
-            </div>
-            
-            <button onclick="proceedToCheckout()" 
-                    id="payButton"
-                    class="w-full px-5 py-3 rounded-2xl bg-slate-900 text-white font-medium shadow hover:shadow-md disabled:opacity-60">
-                Continuar
-            </button>
-            
-            <p class="text-[11px] text-slate-500 text-center">
-                Los pagos se procesan de forma segura
+            <p class="text-[11px] text-slate-500 text-center mt-3">
+                Los pagos se procesan de forma segura con Mercado Pago
             </p>
         </div>
         <div id="plansMessage" class="mt-4 hidden"></div>
     `;
+    
+    // Pre-seleccionar el plan mensual por defecto
+    selectedPlan = 'premium_monthly';
     setTimeout(() => lucide.createIcons(), 100);
 }
 

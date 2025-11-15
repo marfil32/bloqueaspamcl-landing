@@ -6,6 +6,11 @@
     <title>BloqueaSpamCL - Activa tu cuenta</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(16px); }
@@ -166,9 +171,15 @@
 
     </div>
 
+    <!-- ORDEN CRÍTICO: Primero Firebase, luego script.js, luego Lucide -->
+    <script>
+        // Inicializar Lucide icons inmediatamente
+        lucide.createIcons();
+    </script>
     <script src="script.js"></script>
     <script>
-        lucide.createIcons();
+        // Re-inicializar Lucide después de cargar script.js
+        setTimeout(() => lucide.createIcons(), 100);
     </script>
 </body>
 </html>

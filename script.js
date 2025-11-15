@@ -122,47 +122,77 @@ function showIOSWaitlist() {
                 </div>
             </div>
             
-            <form onsubmit="submitIOSWaitlist(event)" class="space-y-3 mt-4">
+            <form id="iosWaitlistForm" class="space-y-3 mt-4">
                 <input type="email" id="iosEmail" required 
                        placeholder="tu@email.com"
                        class="w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-                <button type="submit" 
+                <button type="submit" id="iosSubmitBtn"
                         class="w-full rounded-xl bg-slate-900 text-white px-4 py-2 font-medium flex items-center justify-center gap-2">
                     <i data-lucide="bell" class="w-4 h-4"></i>
-                    Unirme a la lista
+                    <span>Unirme a la lista</span>
                 </button>
             </form>
+            <div id="iosMessage" class="mt-4 hidden"></div>
         </div>
     `;
     document.getElementById('platformSection').classList.add('hidden');
     document.getElementById('stepsSection').classList.add('hidden');
-    setTimeout(() => lucide.createIcons(), 100);
+    setTimeout(() => {
+        lucide.createIcons();
+        
+        // Agregar event listener al formulario
+        const form = document.getElementById('iosWaitlistForm');
+        if (form) {
+            form.addEventListener('submit', submitIOSWaitlist);
+        }
+    }, 100);
 }
 
-window.submitIOSWaitlist = async function(e) {
+async function submitIOSWaitlist(e) {
     e.preventDefault();
-    const email = document.getElementById('iosEmail').value;
-    const form = e.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
+    console.log('📝 iOS Waitlist: Iniciando registro...');
     
+    const email = document.getElementById('iosEmail').value;
+    const submitBtn = document.getElementById('iosSubmitBtn');
+    const messageDiv = document.getElementById('iosMessage');
+    
+    if (!submitBtn) {
+        console.error('❌ Botón submit no encontrado');
+        return;
+    }
+    
+    // Guardar HTML original
+    const originalHTML = submitBtn.innerHTML;
+    
+    // Deshabilitar botón y mostrar estado
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span>Registrando...</span>';
     
     try {
+        console.log('📤 Enviando a Cloud Function:', email);
+        
         const response = await fetch(CF_CREATE_MEMBERSHIP, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, platform: 'ios', authMethod: 'email' })
+            body: JSON.stringify({ 
+                email: email, 
+                platform: 'ios', 
+                authMethod: 'email' 
+            })
         });
         
+        console.log('📥 Respuesta recibida:', response.status);
+        
         const data = await response.json();
+        console.log('📊 Data:', data);
         
         if (!response.ok) {
-            throw new Error(data.error || 'Error al registrarse');
+            throw new Error(data.error || 'Error al registrarse en la lista de espera');
         }
         
-        // Mostrar mensaje de éxito
+        console.log('✅ Registro exitoso');
+        
+        // Mostrar pantalla de éxito
         const container = document.getElementById('formContainer');
         container.innerHTML = `
             <div class="rounded-2xl border border-slate-200 bg-white p-5">
@@ -176,28 +206,50 @@ window.submitIOSWaitlist = async function(e) {
                     </div>
                 </div>
                 
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-4">
                     <p class="text-sm text-slate-700 mb-2">
                         <strong>Email confirmado:</strong><br>
                         ${email}
                     </p>
                     <p class="text-xs text-slate-600">
-                        Te notificaremos cuando la app para iOS esté lista.
+                        Te notificaremos cuando la app para iOS esté disponible.
                     </p>
+                </div>
+                
+                <div class="flex items-start gap-3 p-3 rounded-xl bg-blue-50 border border-blue-200">
+                    <i data-lucide="mail" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                    <div class="text-xs text-blue-800">
+                        <strong>Revisa tu email</strong><br>
+                        Te enviamos una confirmación.
+                    </div>
                 </div>
             </div>
         `;
-        document.getElementById('platformSection').classList.add('hidden');
-        document.getElementById('stepsSection').classList.add('hidden');
         setTimeout(() => lucide.createIcons(), 100);
         
     } catch (error) {
-        showMessage('❌ ' + error.message, 'error');
+        console.error('❌ Error en iOS waitlist:', error);
+        
+        // Mostrar mensaje de error
+        if (messageDiv) {
+            messageDiv.className = 'mt-4 p-4 rounded-xl flex items-start gap-3 bg-red-100 text-red-800 border border-red-300';
+            messageDiv.innerHTML = `
+                <i data-lucide="alert-circle" class="w-5 h-5 mt-0.5"></i>
+                <span class="text-sm">${error.message}</span>
+            `;
+            messageDiv.classList.remove('hidden');
+            setTimeout(() => lucide.createIcons(), 50);
+        }
+        
+        // Restaurar botón
         submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        setTimeout(() => lucide.createIcons(), 100);
+        submitBtn.innerHTML = originalHTML;
+        setTimeout(() => lucide.createIcons(), 50);
     }
-};
+}
+
+// Asegurar que esté disponible globalmente
+window.submitIOSWaitlist = submitIOSWaitlist;
 
 function showSignupForm() {
     const container = document.getElementById('formContainer');

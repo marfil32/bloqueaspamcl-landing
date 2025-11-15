@@ -3,7 +3,7 @@ const CF_CREATE_SUBSCRIPTION = 'https://us-central1-bloqueaspamcl-29064.cloudfun
 const CF_CHECK_USER = 'https://us-central1-bloqueaspamcl-29064.cloudfunctions.net/checkUser';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCLZ0dpw_yDwXvtPVGNDPEcUYQh6h7VKrA",
+  apiKey: "AIzaSyCMU_2azbqV_y5avAXJsXLjWnf5amO7rCI",
   authDomain: "bloqueaspamcl-29064.firebaseapp.com",
   projectId: "bloqueaspamcl-29064",
   storageBucket: "bloqueaspamcl-29064.firebasestorage.app",

@@ -9,13 +9,19 @@
         .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1 { color: #1a73e8; margin-bottom: 5px; }
         h2 { color: #444; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        h3 { color: #555; margin-top: 20px; }
         p { margin: 10px 0; }
-        ul { padding-left: 20px; }
+        ul, ol { padding-left: 20px; }
         li { margin: 8px 0; }
         .updated { color: #666; font-size: 14px; margin-bottom: 30px; }
         a { color: #1a73e8; }
         .back-link { display: inline-block; margin-bottom: 20px; color: #1a73e8; text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
+        .highlight-box { background: #e3f2fd; border-left: 4px solid #1a73e8; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f5f5f5; }
     </style>
 </head>
 <body>
@@ -23,6 +29,9 @@
         <a href="/" class="back-link">&larr; Volver a BloqueaSpam</a>
         <h1>Política de Privacidad</h1>
         <p class="updated">Última actualización: 27 de noviembre de 2025</p>
+        <p><strong>Aplicación:</strong> BloqueaSpam<br>
+        <strong>Desarrollador:</strong> Pablo Morales<br>
+        <strong>Disponible en:</strong> Google Play Store</p>
 
         <h2>1. Información que recopilamos</h2>
         <p>BloqueaSpam recopila la siguiente información para proporcionar el servicio de bloqueo de llamadas:</p>
@@ -47,13 +56,98 @@
         <h2>4. Almacenamiento</h2>
         <p>Tus datos se almacenan de forma segura en Firebase (Google Cloud) y localmente en tu dispositivo. Las preferencias y el historial de bloqueos se sincronizan con tu cuenta si inicias sesión.</p>
 
-        <h2>5. Tus derechos</h2>
-        <p>Puedes:</p>
-        <ul>
-            <li>Eliminar tu historial de llamadas bloqueadas desde la app</li>
-            <li>Cerrar sesión para dejar de sincronizar datos</li>
-            <li>Solicitar la eliminación de tu cuenta contactándonos</li>
-        </ul>
+        <h2 id="eliminacion">5. Eliminación de cuenta y datos del usuario</h2>
+
+        <div class="highlight-box">
+            <strong>BloqueaSpam</strong> te permite solicitar la eliminación completa de tu cuenta y datos personales en cualquier momento.
+        </div>
+
+        <h3>5.1 Cómo solicitar la eliminación de tu cuenta</h3>
+        <p>Para solicitar la eliminación de tu cuenta y datos asociados, sigue estos pasos:</p>
+        <ol>
+            <li><strong>Opción 1 - Desde la app:</strong>
+                <ul>
+                    <li>Abre BloqueaSpam</li>
+                    <li>Ve a <strong>Configuración</strong> (ícono de engranaje)</li>
+                    <li>Desplázate hasta <strong>"Cuenta"</strong></li>
+                    <li>Toca <strong>"Cerrar sesión"</strong> para desvincularte del dispositivo</li>
+                    <li>Para eliminación completa, contacta a soporte</li>
+                </ul>
+            </li>
+            <li><strong>Opción 2 - Por correo electrónico:</strong>
+                <ul>
+                    <li>Envía un email a <a href="mailto:contacto@bloqueaspam.cl">contacto@bloqueaspam.cl</a></li>
+                    <li>Asunto: "Solicitud de eliminación de cuenta"</li>
+                    <li>Incluye el email asociado a tu cuenta de BloqueaSpam</li>
+                    <li>Recibirás confirmación en un plazo máximo de 7 días hábiles</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>5.2 Datos que se eliminarán</h3>
+        <p>Al solicitar la eliminación de tu cuenta, se borrarán permanentemente:</p>
+        <table>
+            <tr>
+                <th>Tipo de dato</th>
+                <th>Acción</th>
+                <th>Plazo</th>
+            </tr>
+            <tr>
+                <td>Email y datos de perfil</td>
+                <td>Eliminación permanente</td>
+                <td>Inmediato</td>
+            </tr>
+            <tr>
+                <td>Historial de llamadas bloqueadas</td>
+                <td>Eliminación permanente</td>
+                <td>Inmediato</td>
+            </tr>
+            <tr>
+                <td>Lista de números bloqueados manualmente</td>
+                <td>Eliminación permanente</td>
+                <td>Inmediato</td>
+            </tr>
+            <tr>
+                <td>Lista de números permitidos (whitelist)</td>
+                <td>Eliminación permanente</td>
+                <td>Inmediato</td>
+            </tr>
+            <tr>
+                <td>Preferencias y configuraciones</td>
+                <td>Eliminación permanente</td>
+                <td>Inmediato</td>
+            </tr>
+            <tr>
+                <td>Dispositivos vinculados</td>
+                <td>Desvinculación completa</td>
+                <td>Inmediato</td>
+            </tr>
+        </table>
+
+        <h3>5.3 Datos que pueden conservarse</h3>
+        <div class="warning-box">
+            <p>Los siguientes datos pueden conservarse de forma anónima para el funcionamiento del servicio comunitario:</p>
+        </div>
+        <table>
+            <tr>
+                <th>Tipo de dato</th>
+                <th>Motivo de retención</th>
+                <th>Período de retención</th>
+            </tr>
+            <tr>
+                <td>Números reportados como spam (600/809)</td>
+                <td>Base de datos comunitaria de spam (sin identificación del usuario que reportó)</td>
+                <td>Indefinido (datos anónimos)</td>
+            </tr>
+            <tr>
+                <td>Estadísticas agregadas de uso</td>
+                <td>Mejora del servicio (sin datos personales)</td>
+                <td>Indefinido (datos anónimos)</td>
+            </tr>
+        </table>
+
+        <h3>5.4 Datos almacenados localmente</h3>
+        <p>Los datos almacenados únicamente en tu dispositivo (historial local, caché) se eliminan automáticamente al desinstalar la aplicación BloqueaSpam.</p>
 
         <h2>6. Permisos requeridos</h2>
         <ul>
@@ -70,7 +164,10 @@
         <p>Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos sobre cambios significativos a través de la aplicación o por correo electrónico.</p>
 
         <h2>9. Contacto</h2>
-        <p>Para preguntas sobre privacidad o solicitudes de eliminación de datos, contáctanos en: <a href="mailto:contacto@bloqueaspam.cl">contacto@bloqueaspam.cl</a></p>
+        <p>Para preguntas sobre privacidad, solicitudes de eliminación de datos o cualquier consulta relacionada con tus datos personales, contáctanos en:</p>
+        <p><strong>Email:</strong> <a href="mailto:contacto@bloqueaspam.cl">contacto@bloqueaspam.cl</a><br>
+        <strong>Desarrollador:</strong> Pablo Morales<br>
+        <strong>Aplicación:</strong> BloqueaSpam (disponible en Google Play Store)</p>
     </div>
 </body>
 </html>
